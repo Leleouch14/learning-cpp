@@ -1,0 +1,54 @@
+import flet as ft
+import sqlite3
+
+# 1. Your SQL Brain
+def init_db():
+    # This creates a local database file right on the device
+    conn = sqlite3.connect("local_vault.db", check_same_thread=False)
+    cursor = conn.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS secure_data (id INTEGER PRIMARY KEY, entry TEXT)")
+    conn.commit()
+    return conn
+
+# 2. Your Flet UI
+def main(page: ft.Page):
+    page.title = "Local Privacy Vault"
+    page.theme_mode = ft.ThemeMode.DARK
+    
+    conn = init_db()
+
+    # Create UI Widgets in Python
+    data_input = ft.TextField(label="Enter sensitive data here")
+    feedback_text = ft.Text("Database is empty.")
+
+    # Button Click Logic
+    def save_to_db(e):
+        if not data_input.value:
+            return
+            
+        # Standard SQL Insert
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO secure_data (entry) VALUES (?)", (data_input.value,))
+        conn.commit()
+        
+        # Read it back to prove it worked
+        cursor.execute("SELECT * FROM secure_data")
+        records = cursor.fetchall()
+        
+        # Update UI
+        feedback_text.value = f"Saved locally! Current DB contents:\n{records}"
+        data_input.value = ""
+        page.update()
+
+    save_btn = ft.ElevatedButton("Save to Local SQLite", on_click=save_to_db)
+
+    # Push widgets to the screen
+    page.add(
+        ft.Text("Zero-Cloud Local App", size=24, weight=ft.FontWeight.BOLD),
+        data_input,
+        save_btn,
+        feedback_text
+    )
+
+# Run the app
+ft.app(target=main)
