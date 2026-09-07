@@ -1,0 +1,18 @@
+.vscode/
+.DS_Store
+
+# C/C++ Compiled Binaries & Object Files
+*.o
+*.obj
+*.out
+*.exe
+*.app
+
+# Debug Symbols & Build Artifacts
+*.dSYM/
+build/
+bin/
+dist/
+
+# macOS Junk
+.DS_Store
